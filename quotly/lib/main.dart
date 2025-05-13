@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'models/quote.dart';
 import 'berandapage.dart';
 import 'buatkutipanpage.dart';
 import 'favoritpage.dart';
@@ -35,21 +36,31 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
 
-  // Halaman-halaman yang sudah dibuat
-  final List<Widget> _pages = const [
-    BerandaPage(),
-    BuatKutipanPage(),
-    FavoritPage(),
-    BagikanPage(),
-  ];
+  // List untuk menyimpan semua kutipan
+  List<Quote> _quotes = [];
 
-  void _onItemTapped(int index) {
+  // Fungsi untuk menambahkan kutipan baru
+  void _addQuote(Quote quote) {
     setState(() {
-      _selectedIndex = index;
+      _quotes.insert(0, quote); // Tambah di paling atas
     });
   }
 
-  final List<String> _titles = const [
+  // Fungsi untuk toggle favorit
+  void _toggleFavorite(Quote quote) {
+    setState(() {
+      quote.isFavorite = !quote.isFavorite;
+    });
+  }
+
+  // Fungsi untuk menghapus kutipan
+  void _deleteQuote(Quote quote) {
+    setState(() {
+      _quotes.remove(quote);
+    });
+  }
+
+  final List<String> _titles = [
     'Beranda',
     'Buat Kutipan',
     'Favorit',
@@ -58,6 +69,22 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Halaman-halaman utama
+    final List<Widget> _pages = [
+      BerandaPage(
+        quotes: _quotes,
+        onToggleFavorite: _toggleFavorite,
+        onDeleteQuote: _deleteQuote,
+      ),
+      BuatKutipanPage(onAddQuote: _addQuote),
+      FavoritPage(
+        quotes: _quotes,
+        onToggleFavorite: _toggleFavorite,
+        onDeleteQuote: _deleteQuote,
+      ),
+      BagikanPage(quotes: _quotes),
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_titles[_selectedIndex]),
@@ -66,7 +93,7 @@ class _MainPageState extends State<MainPage> {
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        onTap: (index) => setState(() => _selectedIndex = index),
         selectedItemColor: Colors.indigo,
         unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,

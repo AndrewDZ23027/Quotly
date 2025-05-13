@@ -1,80 +1,75 @@
 import 'package:flutter/material.dart';
+import 'models/quote.dart';
 
 class FavoritPage extends StatelessWidget {
-  const FavoritPage({Key? key}) : super(key: key);
+  final List<Quote> quotes;
+  final Function(Quote) onToggleFavorite;
+  final Function(Quote) onDeleteQuote;
 
-  // Contoh data kutipan favorit
-  final List<Map<String, String>> favoriteQuotes = const [
-    {
-      'quote': 'Jadilah perubahan yang ingin kamu lihat di dunia.',
-      'author': 'Mahatma Gandhi',
-    },
-    {
-      'quote': 'Kesuksesan adalah gabungan dari kerja keras dan ketekunan.',
-      'author': 'Albert Einstein',
-    },
-  ];
+  const FavoritPage({
+    Key? key,
+    required this.quotes,
+    required this.onToggleFavorite,
+    required this.onDeleteQuote,
+  }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: favoriteQuotes.isEmpty
-            ? Center(
-                child: Text(
-                  'Belum ada kutipan favorit.',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-              )
-            : ListView.builder(
-                padding: const EdgeInsets.all(16.0),
-                itemCount: favoriteQuotes.length,
-                itemBuilder: (context, index) {
-                  final quote = favoriteQuotes[index];
-                  return FavoriteQuoteCard(
-                    quote: quote['quote']!,
-                    author: quote['author']!,
-                  );
-                },
-              ),
+  void _konfirmasiHapus(BuildContext context, Quote quote) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hapus Kutipan'),
+        content: const Text('Apakah kamu yakin ingin menghapus kutipan ini?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () {
+              onDeleteQuote(quote);
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('Hapus'),
+          ),
+        ],
       ),
     );
   }
-}
-
-class FavoriteQuoteCard extends StatelessWidget {
-  final String quote;
-  final String author;
-
-  const FavoriteQuoteCard({
-    Key? key,
-    required this.quote,
-    required this.author,
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '"$quote"',
-              style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+    final favoriteQuotes = quotes.where((q) => q.isFavorite).toList();
+
+    if (favoriteQuotes.isEmpty) {
+      return const Center(child: Text('Belum ada kutipan favorit.'));
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: favoriteQuotes.length,
+      itemBuilder: (context, index) {
+        final quote = favoriteQuotes[index];
+        return Card(
+          margin: const EdgeInsets.only(bottom: 16),
+          child: ListTile(
+            title: Text('"${quote.text}"'),
+            subtitle: Text('- ${quote.author}'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.favorite, color: Colors.red),
+                  onPressed: () => onToggleFavorite(quote),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.grey),
+                  onPressed: () => _konfirmasiHapus(context, quote),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              '- $author',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
