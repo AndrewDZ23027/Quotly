@@ -13,29 +13,6 @@ class BerandaPage extends StatelessWidget {
     required this.onDeleteQuote,
   }) : super(key: key);
 
-  void _konfirmasiHapus(BuildContext context, Quote quote) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Hapus Kutipan'),
-        content: const Text('Apakah kamu yakin ingin menghapus kutipan ini?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Batal'),
-          ),
-          TextButton(
-            onPressed: () {
-              onDeleteQuote(quote);
-              Navigator.of(ctx).pop();
-            },
-            child: const Text('Hapus'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     if (quotes.isEmpty) {
@@ -43,30 +20,37 @@ class BerandaPage extends StatelessWidget {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       itemCount: quotes.length,
       itemBuilder: (context, index) {
         final quote = quotes[index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: ListTile(
-            title: Text('"${quote.text}"'),
-            subtitle: Text('- ${quote.author}'),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: Icon(
-                    quote.isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: Colors.red,
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: Card(
+            key: ValueKey(quote),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            elevation: 4,
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            child: ListTile(
+              title: Text('"${quote.text}"'),
+              subtitle: Text('- ${quote.author}'),
+              trailing: Wrap(
+                spacing: 8,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      quote.isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: Colors.red,
+                    ),
+                    onPressed: () => onToggleFavorite(quote),
                   ),
-                  onPressed: () => onToggleFavorite(quote),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.grey),
-                  onPressed: () => _konfirmasiHapus(context, quote),
-                ),
-              ],
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => onDeleteQuote(quote),
+                  ),
+                ],
+              ),
             ),
           ),
         );

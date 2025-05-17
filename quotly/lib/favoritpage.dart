@@ -13,59 +13,30 @@ class FavoritPage extends StatelessWidget {
     required this.onDeleteQuote,
   }) : super(key: key);
 
-  void _konfirmasiHapus(BuildContext context, Quote quote) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Hapus Kutipan'),
-        content: const Text('Apakah kamu yakin ingin menghapus kutipan ini?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Batal'),
-          ),
-          TextButton(
-            onPressed: () {
-              onDeleteQuote(quote);
-              Navigator.of(ctx).pop();
-            },
-            child: const Text('Hapus'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final favoriteQuotes = quotes.where((q) => q.isFavorite).toList();
+    final favoritQuotes = quotes.where((q) => q.isFavorite).toList();
 
-    if (favoriteQuotes.isEmpty) {
+    if (favoritQuotes.isEmpty) {
       return const Center(child: Text('Belum ada kutipan favorit.'));
     }
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: favoriteQuotes.length,
+      itemCount: favoritQuotes.length,
       itemBuilder: (context, index) {
-        final quote = favoriteQuotes[index];
+        final quote = favoritQuotes[index];
         return Card(
-          margin: const EdgeInsets.only(bottom: 16),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 3,
+          margin: const EdgeInsets.symmetric(vertical: 8),
           child: ListTile(
             title: Text('"${quote.text}"'),
             subtitle: Text('- ${quote.author}'),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.favorite, color: Colors.red),
-                  onPressed: () => onToggleFavorite(quote),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.grey),
-                  onPressed: () => _konfirmasiHapus(context, quote),
-                ),
-              ],
+            trailing: IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () => onDeleteQuote(quote),
             ),
           ),
         );

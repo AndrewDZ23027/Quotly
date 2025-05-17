@@ -18,7 +18,7 @@ class QuotlyApp extends StatelessWidget {
       title: 'Quotly',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.indigo,
+        primarySwatch: Colors.red,
         useMaterial3: true,
       ),
       home: const MainPage(),
@@ -90,12 +90,15 @@ class _MainPageState extends State<MainPage> {
         title: Text(_titles[_selectedIndex]),
         centerTitle: true,
       ),
-      body: _pages[_selectedIndex],
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: _pages[_selectedIndex],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
         selectedItemColor: Colors.indigo,
-        unselectedItemColor: Colors.grey,
+        unselectedItemColor: Colors.red,
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(

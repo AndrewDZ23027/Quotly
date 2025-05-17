@@ -7,31 +7,31 @@ class BagikanPage extends StatelessWidget {
 
   const BagikanPage({Key? key, required this.quotes}) : super(key: key);
 
-  void _shareQuote(Quote quote) {
-    final message =
-        '📢 Kutipan dari Quotly:\n\n"${quote.text}"\n- ${quote.author}';
-    Share.share(message);
-  }
-
   @override
   Widget build(BuildContext context) {
     if (quotes.isEmpty) {
-      return const Center(child: Text('Belum ada kutipan yang tersedia.'));
+      return const Center(child: Text('Belum ada kutipan untuk dibagikan.'));
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16),
       itemCount: quotes.length,
       itemBuilder: (context, index) {
         final quote = quotes[index];
         return Card(
-          margin: const EdgeInsets.only(bottom: 16),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 2,
+          margin: const EdgeInsets.symmetric(vertical: 8),
           child: ListTile(
             title: Text('"${quote.text}"'),
             subtitle: Text('- ${quote.author}'),
             trailing: IconButton(
-              icon: const Icon(Icons.share, color: Colors.blue),
-              onPressed: () => _shareQuote(quote),
+              icon: const Icon(Icons.share, color: Colors.red),
+              onPressed: () {
+                final content = '"${quote.text}"\n\n- ${quote.author}';
+                Share.share(content);
+              },
             ),
           ),
         );
