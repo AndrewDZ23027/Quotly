@@ -4,7 +4,7 @@ import 'models/quote.dart';
 class BuatKutipanPage extends StatefulWidget {
   final Function(Quote) onAddQuote;
 
-  const BuatKutipanPage({Key? key, required this.onAddQuote}) : super(key: key);
+  const BuatKutipanPage({super.key, required this.onAddQuote});
 
   @override
   State<BuatKutipanPage> createState() => _BuatKutipanPageState();
@@ -13,16 +13,38 @@ class BuatKutipanPage extends StatefulWidget {
 class _BuatKutipanPageState extends State<BuatKutipanPage> {
   final _textController = TextEditingController();
   final _authorController = TextEditingController();
+  final _sourceController = TextEditingController();
+  final _titleController = TextEditingController();
+  final _tagsController = TextEditingController();
 
   void _submit() {
     final text = _textController.text.trim();
     final author = _authorController.text.trim();
+    final source = _sourceController.text.trim();
+    final title = _titleController.text.trim();
+    final tags = _tagsController.text
+        .split(',')
+        .map((tag) => tag.trim())
+        .where((tag) => tag.isNotEmpty)
+        .toList();
 
-    if (text.isNotEmpty && author.isNotEmpty) {
-      final newQuote = Quote(text: text, author: author);
+    if (text.isNotEmpty &&
+        author.isNotEmpty &&
+        source.isNotEmpty &&
+        title.isNotEmpty) {
+      final newQuote = Quote(
+        text: text,
+        author: author,
+        source: source,
+        title: title,
+        tags: tags,
+      );
       widget.onAddQuote(newQuote);
       _textController.clear();
       _authorController.clear();
+      _sourceController.clear();
+      _titleController.clear();
+      _tagsController.clear();
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Kutipan berhasil ditambahkan!')),
@@ -32,7 +54,7 @@ class _BuatKutipanPageState extends State<BuatKutipanPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
@@ -52,6 +74,30 @@ class _BuatKutipanPageState extends State<BuatKutipanPage> {
               border: OutlineInputBorder(),
             ),
           ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _sourceController,
+            decoration: const InputDecoration(
+              labelText: 'Sumber (buku/film)',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _titleController,
+            decoration: const InputDecoration(
+              labelText: 'Judul',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _tagsController,
+            decoration: const InputDecoration(
+              labelText: 'Tag (pisahkan dengan koma)',
+              border: OutlineInputBorder(),
+            ),
+          ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             icon: const Icon(Icons.save),
@@ -60,7 +106,8 @@ class _BuatKutipanPageState extends State<BuatKutipanPage> {
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30)),
+                borderRadius: BorderRadius.circular(30),
+              ),
             ),
           ),
         ],
